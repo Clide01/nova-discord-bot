@@ -1,0 +1,52 @@
+name: Monitor API Supported Domains
+
+on:
+  schedule:
+    # Runs automatically every 12 hours (Midnight and Noon UTC)
+    - cron: '0 0,12 * * *'
+  workflow_dispatch: # Allows you to run it manually with a single click
+
+jobs:
+  monitor-api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Fetch Latest API Data
+        run: |
+          # Grabs the raw text format of the supported domains
+          curl -s https://api-bypassers.onrender.com/api/supported > new_domains.txt || true
+          
+          # Fallback check if the main endpoint fails
+          if [ ! -s new_domains.txt ]; then
+            curl -s https://i-bypassers.onrender.com/supported > new_domains.txt
+          fi
+          
+      - name: Compare for Changes
+        id: diff
+        run: |
+          if cmp -s supported_domains.txt new_domains.txt; then
+            echo "No changes detected."
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changes detected!"
+            echo "changed=true" >> $GITHUB_OUTPUT
+            mv new_domains.txt supported_domains.txt
+          fi
+
+      - name: Commit Updated List to GitHub
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add supported_domains.txt
+          git commit -m "chore: API supported domains updated"
+          git push
+
+      - name: Send Discord Alert
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          curl -H "Content-Type: application/json" \
+          -d '{"content": "🚨 **Heads up!** The Bypass API just updated its supported domains list. Check your repository history to see what was added or removed!"}' \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}

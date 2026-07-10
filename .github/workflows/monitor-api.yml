@@ -9,16 +9,15 @@ on:
 jobs:
   monitor-api:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # 🌟 FIX: Gives the script permission to push changes back to your repo
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Fetch Latest API Data
         run: |
-          # Grabs the raw text format of the supported domains
           curl -s https://api-bypassers.onrender.com/api/supported > new_domains.txt || true
-          
-          # Fallback check if the main endpoint fails
           if [ ! -s new_domains.txt ]; then
             curl -s https://i-bypassers.onrender.com/supported > new_domains.txt
           fi

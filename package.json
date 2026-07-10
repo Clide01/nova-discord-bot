@@ -1,0 +1,16 @@
+{
+  "name": "novabypass",
+  "version": "1.0.0",
+  "description": "Discord link bypass bot",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "cheerio": "^1.0.0-rc.12",
+    "discord.js": "^14.14.0",
+    "dotenv": "^16.4.0",
+    "express": "^5.2.1"
+  }
+}

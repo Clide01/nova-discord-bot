@@ -1,1 +1,10 @@
-{"success":false,"error":"Access denied: Automated requests are not allowed"}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>Cannot GET /api/supported</pre>
+</body>
+</html>
